@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "debugType": "portable",
+    "emitEntryPoint": true,
+    "copyToOutput": {
+      "include": "appsettings.json"
+    }
+  },
+  "dependencies": {
+    "Microsoft.Extensions.Configuration": "1.0.0",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0",
+    "Microsoft.EntityFrameworkCore": "1.0.0",
+    "Microsoft.EntityFrameworkCore.Sqlite": "1.0.0"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        }
+      },
+      "imports": "dnxcore50"
+    }
+  }
+}
