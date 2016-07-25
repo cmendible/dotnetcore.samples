@@ -18,6 +18,7 @@
             // Get the connection string
             string connectionString = configuration.GetConnectionString("Sample");
 
+            // With this code we are going to simulate an authenticated user.
             ClaimsPrincipal.ClaimsPrincipalSelector = () =>
                 {
                     return new ClaimsPrincipal(new ClaimsIdentity(new GenericIdentity("cmendibl3")));
