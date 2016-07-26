@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "debugType": "portable",
+    "emitEntryPoint": true,
+    "copyToOutput": {
+    }
+  },
+  "dependencies": {
+    "Microsoft.ProjectOxford.Face": "1.1.0",
+    "System.Runtime.Serialization.Primitives": "4.1.1",
+    "ImageProcessorCore": "1.0.0-alpha-941"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        }
+      },
+      "imports": "dnxcore50"
+    }
+  }
+}
