@@ -11,37 +11,46 @@
 
     public class Program
     {
-        static FaceServiceClient faceServiceClient;
-
         public static void Main(string[] args)
+        {
+            const string sourceImage = "faces.jpg";
+            const string destinationImage = "detectedfaces.jpg";
+
+            var configuration = BuildConfiguration();
+
+            var faceRects = UploadAndDetectFaces(sourceImage, configuration["FaceAPIKey"]).Result;
+            
+            Console.WriteLine($"Detected {faceRects.Length} faces");
+
+            BlurFaces(faceRects, sourceImage, destinationImage);
+
+            Console.WriteLine($"Done!!!");
+        }
+
+        private static IConfigurationRoot BuildConfiguration()
         {
             // Enable to app to read json setting files
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-#if DEBUG
+            #if DEBUG
             builder.AddUserSecrets("cmendible3-dotnetcore.samples-projectOxford");
-#endif
+            #endif
 
-            var configuration = builder.Build();
+            return builder.Build();
+        }
 
-            var apiKey = configuration["FaceAPIKey"];
-
-            if (File.Exists("detectedfaces.jpg"))
+        private static void BlurFaces(FaceRectangle[] faceRects, string sourceImage, string destinationImage)
+        {
+            if (File.Exists(destinationImage))
             {
-                File.Delete("detectedfaces.jpg");
+                File.Delete(destinationImage);
             }
-
-            faceServiceClient = new FaceServiceClient(apiKey);
-
-            var faceRects = UploadAndDetectFaces("faces.jpg").Result;
-
-            Console.WriteLine($"Detected {faceRects.Length} faces");
 
             if (faceRects.Length > 0)
             {
                 using (FileStream stream = File.OpenRead("faces.jpg"))
-                using (FileStream output = File.OpenWrite("detectedfaces.jpg"))
+                using (FileStream output = File.OpenWrite(destinationImage))
                 {
                     Image image = new Image(stream);
 
@@ -59,10 +68,13 @@
                     image.SaveAsJpeg(output);
                 }
             }
+
         }
 
-        private static async Task<FaceRectangle[]> UploadAndDetectFaces(string imageFilePath)
+        private static async Task<FaceRectangle[]> UploadAndDetectFaces(string imageFilePath, string apiKey)
         {
+            var faceServiceClient = new FaceServiceClient(apiKey);
+
             try
             {
                 using (Stream imageFileStream = File.OpenRead(imageFilePath))
