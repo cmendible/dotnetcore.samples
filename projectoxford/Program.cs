@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using ImageProcessorCore;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.ProjectOxford.Face;
     using Microsoft.ProjectOxford.Face.Contract;
 
@@ -14,12 +15,24 @@
 
         public static void Main(string[] args)
         {
+            // Enable to app to read json setting files
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+#if DEBUG
+            builder.AddUserSecrets("cmendible3-dotnetcore.samples-projectOxford");
+#endif
+
+            var configuration = builder.Build();
+
+            var apiKey = configuration["FaceAPIKey"];
+
             if (File.Exists("detectedfaces.jpg"))
             {
                 File.Delete("detectedfaces.jpg");
             }
 
-            faceServiceClient = new FaceServiceClient("[Your API Key here..]");
+            faceServiceClient = new FaceServiceClient(apiKey);
 
             var faceRects = UploadAndDetectFaces("faces.jpg").Result;
 
@@ -35,7 +48,7 @@
                     foreach (var faceRect in faceRects)
                     {
                         var rectangle = new Rectangle(
-                            faceRect.Left ,
+                            faceRect.Left,
                             faceRect.Top,
                             faceRect.Width,
                             faceRect.Height);
