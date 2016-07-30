@@ -18,13 +18,19 @@
 
             var configuration = BuildConfiguration();
 
-            var faceRects = UploadAndDetectFaces(sourceImage, configuration["FaceAPIKey"]).Result;
-            
-            Console.WriteLine($"Detected {faceRects.Length} faces");
+            UploadAndDetectFaces(sourceImage, configuration["FaceAPIKey"])
+                .ContinueWith((task) =>
+                {
+                    var faceRects = task.Result;
 
-            BlurFaces(faceRects, sourceImage, destinationImage);
+                    Console.WriteLine($"Detected {faceRects.Length} faces");
 
-            Console.WriteLine($"Done!!!");
+                    BlurFaces(faceRects, sourceImage, destinationImage);
+
+                    Console.WriteLine($"Done!!!");
+                });
+
+            Console.ReadLine();
         }
 
         private static IConfigurationRoot BuildConfiguration()
@@ -33,9 +39,9 @@
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            #if DEBUG
+#if DEBUG
             builder.AddUserSecrets("cmendible3-dotnetcore.samples-projectOxford");
-            #endif
+#endif
 
             return builder.Build();
         }
