@@ -80,7 +80,7 @@
                 using (FileStream stream = File.OpenRead("faces.jpg"))
                 using (FileStream output = File.OpenWrite(destinationImage))
                 {
-                    Image image = new Image(stream);
+                    var image = new Image<Color, uint>(stream);
 
                     // Blur every detected face
                     foreach (var faceRect in faceRects)
