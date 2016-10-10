@@ -22,5 +22,5 @@ EXPOSE 5000
 # Restore nuget packages
 RUN dotnet restore
 
-# Start de application using dotnet!!!
+# Start the application using dotnet!!!
 ENTRYPOINT dotnet run
