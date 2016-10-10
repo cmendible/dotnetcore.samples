@@ -13,7 +13,7 @@
         public void Will_Fail_After_Noon()
         {
             var svc = new TimeDependentService();
-            Assert.True(svc.IsMorning());
+            Assert.True(svc.OldIsMorning());
         }
 
         /// <summary>
