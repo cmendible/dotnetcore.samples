@@ -23,6 +23,7 @@
         [Fact]
         public void Will_Run_OK_No_Matter_The_Real_Time()
         {
+            // Force the time to 11 AM
             SystemDateTime.Now = () => new DateTime(2016, 10, 10, 11, 0, 0);
             var svc = new TimeDependentService();
             Assert.True(svc.IsMorning());
