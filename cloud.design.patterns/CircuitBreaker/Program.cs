@@ -1,7 +1,6 @@
 ﻿namespace CircuitBreaker.Sample
 {
     using System;
-    using System.Threading;
 
     class Program
     {
