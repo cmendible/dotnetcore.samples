@@ -4,7 +4,9 @@
     "debugType": "portable",
     "emitEntryPoint": true
   },
-  "dependencies": {},
+  "dependencies": {
+    "Polly": "4.3.0"
+  },
   "frameworks": {
     "netcoreapp1.0": {
       "dependencies": {
