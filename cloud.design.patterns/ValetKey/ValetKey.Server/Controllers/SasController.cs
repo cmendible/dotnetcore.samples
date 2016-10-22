@@ -1,17 +1,7 @@
-﻿// ==============================================================================================================
-// Microsoft patterns & practices
-// Cloud Design Patterns project
-// ==============================================================================================================
-// ©2013 Microsoft. All rights reserved. 
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance 
-// with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-// Unless required by applicable law or agreed to in writing, software distributed under the License is 
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-// See the License for the specific language governing permissions and limitations under the License.
-// ==============================================================================================================
-namespace ValetKey.Web.Api.Controllers
+﻿namespace ValetKey.Web.Api.Controllers
 {
     using System;
+    using System.IO;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Security.Cryptography;
@@ -24,7 +14,7 @@ namespace ValetKey.Web.Api.Controllers
     {
         private readonly string blobContainer = "valetkeysample";
 
-        [HttpGet] 
+        [HttpGet]
         public IActionResult Get()
         {
             try
@@ -47,38 +37,49 @@ namespace ValetKey.Web.Api.Controllers
         /// </summary>
         private StorageEntitySas GetSharedAccessReferenceForUpload(string blobName)
         {
-            var storageKey = "";
             var accountName = "";
+            var storageKey = "";
             var sasVersion = "2015-07-08";
             DateTimeOffset sharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5);
-            DateTimeOffset sharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(-5);
+            DateTimeOffset sharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(5);
 
             var st = sharedAccessStartTime.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
             var se = sharedAccessExpiryTime.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
             string canonicalNameFormat = $"/blob/{accountName}/{blobContainer}/{blobName}";
 
-            var sas = GetSharedAccessSignature(accountName, sasVersion, storageKey, st, se);
-            var credentials = UrlEncoder.Default.Encode($"?sv={sasVersion}&sr=b&sig={sas}&st={st}&se={se}&srt=o&sp=w");
+            var sas = GetSharedAccessSignature(canonicalNameFormat, sasVersion, storageKey, st, se);
+            var credentials = $"?sv={sasVersion}&sr=b&sig={UrlEncoder.Default.Encode(sas)}&st={UrlEncoder.Default.Encode(st)}&se={UrlEncoder.Default.Encode(se)}&sp=w";
 
             var blobSas = new StorageEntitySas
             {
-                BlobUri =  new Uri($"https://{accountName}.blob.core.windows.net/{blobContainer}/{blobName}"),
+                BlobUri = new Uri($"https://{accountName}.blob.core.windows.net/{blobContainer}/{blobName}"),
                 Credentials = credentials,
                 Name = blobName
             };
 
-            var currentDateTime = DateTime.UtcNow.ToString("U");
-            string tosign = $"PUT\n\n\n\n\n\n\n\n\n\n\n\nx-ms-date:{currentDateTime}\nx-ms-version:2015-02-21\n/{accountName}/{blobContainer}\nrestype:container\ntimeout:30";
-            string sharedKey = GetHash(tosign, storageKey);
+            var currentDateTime = DateTime.UtcNow.ToString("R");
+
+            var requestMethod = "PUT";
+            var blobLength = string.Empty;
+
+            var stringToSign = String.Format(
+                "{0}\n\n\n{1}\n\n\n\n\n\n\n\n\n{2}\n{3}",
+                requestMethod,
+                blobLength,
+                $"x-ms-blob-type:BlockBlob\nx-ms-date:{currentDateTime}\nx-ms-version:2015-02-21",
+                $"/{accountName}/{blobContainer}/{blobName}");
+
+            string sharedKey = GetHash(stringToSign, storageKey);
 
             using (var client = new HttpClient())
             {
+                client.DefaultRequestHeaders.Add("x-ms-blob-type", "BlockBlob");
                 client.DefaultRequestHeaders.Add("x-ms-date", currentDateTime);
                 client.DefaultRequestHeaders.Add("x-ms-version", "2015-02-21");
-                client.DefaultRequestHeaders.Add("x-ms-blob-type", "BlockBlob");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("SharedKey", $" {accountName}:{sharedKey}");
-                var content = new StringContent(string.Empty);
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("SharedKey", $"{accountName}:{sharedKey}");
+                var content = new StreamContent(new MemoryStream());
 
                 var result = client.PutAsync(
                     blobSas.BlobUri.ToString(),
@@ -98,7 +99,7 @@ namespace ValetKey.Web.Api.Controllers
                 resourceName,
                 string.Empty,
                 string.Empty,
-                "https",
+                string.Empty,
                 sasVersion,
                 string.Empty,
                 string.Empty,
