@@ -3,7 +3,10 @@
   "version": "1.0.0-*",
   "buildOptions": {
     "debugType": "portable",
-    "emitEntryPoint": true
+    "emitEntryPoint": true,
+    "copyToOutput": {
+      "include": "appsettings.json"
+    }
   },
   "dependencies": {
     "Microsoft.Extensions.Configuration": "1.0.0",
@@ -21,6 +24,12 @@
         }
       },
       "imports": "dnxcore50"
+    }
+  },
+  "tools": {
+    "Microsoft.Extensions.SecretManager.Tools": {
+      "version": "1.0.0-*",
+      "imports": "portable-net45+win8+dnxcore50"
     }
   }
 }
