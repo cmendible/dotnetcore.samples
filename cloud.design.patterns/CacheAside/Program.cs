@@ -1,8 +1,9 @@
 ﻿namespace CacheAside
 {
+    using System;
     using Microsoft.Extensions.Configuration;
     using StackExchange.Redis;
-    
+
     public class Program
     {
         public static void Main(string[] args)
@@ -22,6 +23,8 @@
             entity = repo.GetById(1);
             repo.Update(entity);
             entity = repo.GetById(1);
+
+            Console.ReadLine();
         }
 
         /// <summary>
