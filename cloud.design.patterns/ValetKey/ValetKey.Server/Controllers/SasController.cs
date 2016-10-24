@@ -8,11 +8,21 @@
     using System.Text;
     using System.Text.Encodings.Web;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
 
     [Route("api/[controller]")]
     public class SasController : Controller
     {
+        string accountName = string.Empty;
+        string storageKey =  string.Empty;
+
         private readonly string blobContainer = "valetkeysample";
+
+        public SasController(IConfigurationRoot configuration)
+        {
+            accountName = configuration["StorageAccountName"];
+            storageKey = configuration["StorageAccountKey"];
+        }
 
         [HttpGet]
         public IActionResult Get()
@@ -37,27 +47,19 @@
         /// </summary>
         private StorageEntitySas GetSharedAccessReferenceForUpload(string blobName)
         {
-            var accountName = "";
-            var storageKey = "";
+            CreateEmtpyBlob(accountName, blobContainer, blobName, storageKey);
+
             var sasVersion = "2015-07-08";
             DateTimeOffset sharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5);
             DateTimeOffset sharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(5);
 
-            var st = sharedAccessStartTime.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
-            var se = sharedAccessExpiryTime.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var blobSas = GetSharedAccessSignature(accountName, blobContainer, blobName, sasVersion, storageKey, sharedAccessStartTime, sharedAccessExpiryTime);
 
-            string canonicalNameFormat = $"/blob/{accountName}/{blobContainer}/{blobName}";
+            return blobSas;
+        }
 
-            var sas = GetSharedAccessSignature(canonicalNameFormat, sasVersion, storageKey, st, se);
-            var credentials = $"?sv={sasVersion}&sr=b&sig={UrlEncoder.Default.Encode(sas)}&st={UrlEncoder.Default.Encode(st)}&se={UrlEncoder.Default.Encode(se)}&sp=w";
-
-            var blobSas = new StorageEntitySas
-            {
-                BlobUri = new Uri($"https://{accountName}.blob.core.windows.net/{blobContainer}/{blobName}"),
-                Credentials = credentials,
-                Name = blobName
-            };
-
+        private void CreateEmtpyBlob(string accountName, string blobContainer, string blobName, string key)
+        {
             var currentDateTime = DateTime.UtcNow.ToString("R");
 
             var requestMethod = "PUT";
@@ -70,7 +72,7 @@
                 $"x-ms-blob-type:BlockBlob\nx-ms-date:{currentDateTime}\nx-ms-version:2015-02-21",
                 $"/{accountName}/{blobContainer}/{blobName}");
 
-            string sharedKey = GetHash(stringToSign, storageKey);
+            string sharedKey = GetHash(stringToSign, key);
 
             using (var client = new HttpClient())
             {
@@ -79,24 +81,38 @@
                 client.DefaultRequestHeaders.Add("x-ms-version", "2015-02-21");
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("SharedKey", $"{accountName}:{sharedKey}");
-                var content = new StreamContent(new MemoryStream());
+                using (var memoryStream = new MemoryStream())
+                {
+                    var content = new StreamContent(memoryStream);
 
-                var result = client.PutAsync(
-                    blobSas.BlobUri.ToString(),
-                    content).Result;
+                    var result = client.PutAsync(
+                        $"https://{accountName}.blob.core.windows.net/{blobContainer}/{blobName}",
+                        content).Result;
+
+                    result.EnsureSuccessStatusCode();
+                }
             }
-
-            return blobSas;
         }
 
-        private string GetSharedAccessSignature(string resourceName, string sasVersion, string key, string sharedAccessStartTime, string sharedAccessExpiryTime)
+        private StorageEntitySas GetSharedAccessSignature(
+            string accountName,
+            string blobContainer,
+            string blobName,
+            string sasVersion,
+            string key,
+            DateTimeOffset sharedAccessStartTime,
+            DateTimeOffset sharedAccessExpiryTime)
         {
+            string canonicalNameFormat = $"/blob/{accountName}/{blobContainer}/{blobName}";
+            var st = sharedAccessStartTime.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var se = sharedAccessExpiryTime.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
+
             string stringToSign = string.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n{8}\n{9}\n{10}\n{11}\n{12}", new object[]
             {
                 "w",
-                sharedAccessStartTime,
-                sharedAccessExpiryTime,
-                resourceName,
+                st,
+                se,
+                canonicalNameFormat,
                 string.Empty,
                 string.Empty,
                 string.Empty,
@@ -108,7 +124,17 @@
                 string.Empty
             });
 
-            return GetHash(stringToSign, key);
+            var sas = GetHash(stringToSign, key);
+
+            var credentials =
+                $"?sv={sasVersion}&sr=b&sig={UrlEncoder.Default.Encode(sas)}&st={UrlEncoder.Default.Encode(st)}&se={UrlEncoder.Default.Encode(se)}&sp=w";
+
+            return new StorageEntitySas
+            {
+                BlobUri = new Uri($"https://{accountName}.blob.core.windows.net/{blobContainer}/{blobName}"),
+                Credentials = credentials,
+                Name = blobName
+            };
         }
 
         private string GetHash(string stringToSign, string key)

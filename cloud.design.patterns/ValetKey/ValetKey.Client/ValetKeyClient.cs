@@ -39,7 +39,7 @@
 
             Console.WriteLine();
             Console.WriteLine("Done. Press any key to exit...");
-            Console.ReadKey();
+            Console.ReadLine();
         }
 
         private static async Task<StorageEntitySas> GetBlobSas(Uri blobUri)
