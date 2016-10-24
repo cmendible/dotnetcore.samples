@@ -14,7 +14,7 @@
     public class SasController : Controller
     {
         string accountName = string.Empty;
-        string storageKey =  string.Empty;
+        string storageKey = string.Empty;
 
         private readonly string blobContainer = "valetkeysample";
 
@@ -49,15 +49,21 @@
         {
             CreateEmtpyBlob(accountName, blobContainer, blobName, storageKey);
 
-            var sasVersion = "2015-07-08";
             DateTimeOffset sharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5);
             DateTimeOffset sharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(5);
 
-            var blobSas = GetSharedAccessSignature(accountName, blobContainer, blobName, sasVersion, storageKey, sharedAccessStartTime, sharedAccessExpiryTime);
+            var blobSas = GetSharedAccessSignature(accountName, blobContainer, blobName, storageKey, sharedAccessStartTime, sharedAccessExpiryTime);
 
             return blobSas;
         }
-
+        
+        /// <summary>
+        /// Creates an empty blob
+        /// </summary>
+        /// <param name="accountName">The Azure Storage accoun name.</param>
+        /// /// <param name="blobContainer">The blob container.</param>
+        /// <param name="blobName">The blob name.</param>
+        /// <param name="key">The storage account key.</param>
         private void CreateEmtpyBlob(string accountName, string blobContainer, string blobName, string key)
         {
             var currentDateTime = DateTime.UtcNow.ToString("R");
@@ -94,18 +100,28 @@
             }
         }
 
+        /// <summary>
+        /// Creates a write only access SAS key for the given blob.
+        /// </summary>
+        /// <param name="accountName">The Azure Storage accoun name.</param>
+        /// <param name="blobContainer">The blob container.</param>
+        /// <param name="blobName">The blob name.</param>
+        /// <param name="key">The storage account key.</param>
+        /// <param name="sharedAccessStartTime">Start time for the SAS key.</param>
+        /// <param name="sharedAccessExpiryTime">Expiraation time for the SAS key.</param>
+        /// <returns>SAS credentials for ther blob.</returns>
         private StorageEntitySas GetSharedAccessSignature(
             string accountName,
             string blobContainer,
             string blobName,
-            string sasVersion,
             string key,
             DateTimeOffset sharedAccessStartTime,
             DateTimeOffset sharedAccessExpiryTime)
         {
-            string canonicalNameFormat = $"/blob/{accountName}/{blobContainer}/{blobName}";
+            var canonicalNameFormat = $"/blob/{accountName}/{blobContainer}/{blobName}";
             var st = sharedAccessStartTime.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
             var se = sharedAccessExpiryTime.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var sasVersion = "2015-07-08";
 
             string stringToSign = string.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}\n{6}\n{7}\n{8}\n{9}\n{10}\n{11}\n{12}", new object[]
             {
@@ -137,6 +153,12 @@
             };
         }
 
+        /// <summary>
+        /// Get's the HMACSHA256 signature.
+        /// </summary>
+        /// <param name="stringToSign">The string to sign.</param>
+        /// <param name="key">The key.</param>
+        /// <returns>The HMACSHA256 hash.</returns>
         private string GetHash(string stringToSign, string key)
         {
             byte[] keyValue = Convert.FromBase64String(key);
