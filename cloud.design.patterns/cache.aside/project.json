@@ -28,7 +28,7 @@
   },
   "tools": {
     "Microsoft.Extensions.SecretManager.Tools": {
-      "version": "1.0.0-*",
+      "version": "1.0.0-preview2-final",
       "imports": "portable-net45+win8+dnxcore50"
     }
   }
