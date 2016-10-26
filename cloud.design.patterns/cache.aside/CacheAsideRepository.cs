@@ -40,6 +40,7 @@
             // If there is a cache miss, get the entity from the original store and cache it.
             // Code has been omitted because it is data store dependent.  
             var entity = this.store.GetById(id);
+            Console.WriteLine($"Entity {entity.Id} was loaded from the database");
 
             if (!cacheException)
             {
@@ -74,7 +75,7 @@
 
             // Then, invalidate the current cache object
             this.cache.KeyDelete(key);
-            Console.WriteLine($"Entity {entity.Id} was removed form the cache");
+            Console.WriteLine($"Entity {entity.Id} was removed from the cache");
         }
 
         private string GetCacheKey(int objectId)
