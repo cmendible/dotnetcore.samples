@@ -1,6 +1,7 @@
 ﻿namespace CircuitBreaker.Sample
 {
     using System;
+    using System.Threading;
     using Polly;
 
     class Program
@@ -13,10 +14,27 @@
                 .Handle<TimeoutException>()
                 .CircuitBreaker(
                     2, // Number of consecutive exceptions before opening the circuit
-                    TimeSpan.FromMinutes(1), // How long the circuit will be open
-                    (exception, timespan) => { Console.WriteLine("Operation failed!!!"); },
-                    () => { Console.WriteLine($"Circuit is Closed!!!"); },
-                    () => { Console.WriteLine($"Circuit is Half Open!!!"); });
+                    TimeSpan.FromSeconds(20), // How long the circuit will be open
+                    (exception, timespan) => 
+                    { 
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("Operation failed!!!"); 
+                        Console.ForegroundColor = ConsoleColor.White;
+                    },
+                    () =>
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.WriteLine($"Circuit is Closed!!!");
+                        Thread.Sleep(2000);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    },
+                    () =>
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.WriteLine($"Circuit is Half Open!!!");
+                        Thread.Sleep(2000);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    });
 
             while (true)
             {
