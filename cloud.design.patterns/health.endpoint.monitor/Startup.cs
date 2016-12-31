@@ -1,5 +1,6 @@
 namespace Health.Enpoint.Monitor
 {
+    using AspNetCore.Health;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -55,14 +56,11 @@ namespace Health.Enpoint.Monitor
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStaticFiles();
+            var options = new HealthCheckOptions()
+                .AddWebService("CodeItYourSelf", "https://carlos.mendible.com")
+                .AddWebService("UnhealthyService", "http://localhost:51234/");
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "api",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseHealthCheck(options);
         }
     }
 }

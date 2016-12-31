@@ -39,7 +39,8 @@
       "version": "1.0.0-preview2-update1",
       "type": "build"
     },
-    "System.Security.Cryptography.Algorithms": "4.2.0"
+    "System.Security.Cryptography.Algorithms": "4.2.0",
+    "AspNetCore.Health" : "1.0.0"
   },
 
   "tools": {
