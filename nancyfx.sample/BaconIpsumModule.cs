@@ -8,7 +8,7 @@ namespace WebApplication
         {
             Get("/", args => "Super Duper Happy Path running on .NET Core");
 
-            Get("/baconipsum", async args => await baconIpsumService.Generate());
+            Get("/baconipsum", async args => await baconIpsumService.GenerateAsync());
         }
     }
 }

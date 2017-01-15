@@ -4,20 +4,28 @@ using System.Threading.Tasks;
 
 namespace WebApplication
 {
+    public class BaconIpsumMessage
+    {
+        public string Body {get; set;}
+    }
+
     public interface IBaconIpsumService
     {
-        Task<string> Generate();
+        Task<BaconIpsumMessage> GenerateAsync();
     }
 
     public class BaconIpsumService : IBaconIpsumService
     {
-        public async Task<string> Generate()
+        public async Task<BaconIpsumMessage> GenerateAsync()
         {
             using (var client = new HttpClient())
             {
+                var message = new BaconIpsumMessage();
                 // Post the message
-                return await client.GetStringAsync(
+                message.Body =  await client.GetStringAsync(
                     $"https://baconipsum.com/api/?type=meat-and-filler");
+
+                return message;
             }
         }
     }
