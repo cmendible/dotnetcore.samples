@@ -67,6 +67,7 @@
 
         public void Update(T entity)
         {
+            Console.WriteLine($"Entity {entity.Id} was updated.");
             // Update the object in the original data store
             this.store.Update(entity);
 
