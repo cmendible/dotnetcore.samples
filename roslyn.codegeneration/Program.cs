@@ -46,7 +46,7 @@ namespace Roslyn.CodeGeneration
             var tree = CSharpSyntaxTree.ParseText(code);
 
             // Get the root CompilationUnitSyntax.
-            var root = await tree.GetRootAsync() as CompilationUnitSyntax;
+            var root = await tree.GetRootAsync().ConfigureAwait(false) as CompilationUnitSyntax;
 
             // Get the namespace declaration.
             var oldNamespace = root.Members.Single(m => m is NamespaceDeclarationSyntax) as NamespaceDeclarationSyntax;
