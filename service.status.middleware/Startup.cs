@@ -61,12 +61,7 @@ namespace WebApplication
                 return Task.FromResult(random.Next(10) != 1);
             });
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
