@@ -1,4 +1,4 @@
-FROM microsoft/dotnet
+FROM microsoft/dotnet:latest
 RUN apt-get -m update
 RUN apt-get install -y wget unzip
 ENV NUGET_XMLDOC_MODE skip
