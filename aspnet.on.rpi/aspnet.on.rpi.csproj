@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RuntimeFrameworkVersion>2.0.0-beta-001776-00</RuntimeFrameworkVersion>
-    <RuntimeIdentifiers>win7-arm;win8-arm</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win8-arm</RuntimeIdentifiers>
   </PropertyGroup>
 
 
@@ -14,5 +14,6 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.0.1" />
+    <PackageReference Include="Libuv" Version="1.10.0-preview1-22036" />
   </ItemGroup>
 </Project>
