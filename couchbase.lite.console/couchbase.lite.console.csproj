@@ -4,6 +4,6 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="couchbase.lite" Version="2.0.0-db003" />
+    <PackageReference Include="couchbase.lite" Version="2.0.0-db004" />
   </ItemGroup>
 </Project>

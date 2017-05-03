@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Couchbase.Lite;
-
-// https://developer.couchbase.com/documentation/mobile/2.0/guides/couchbase-lite/index.html?language=csharp#getting-started
+using Couchbase.Lite.Query;
 
 namespace couchbase.lite
 {
@@ -11,43 +10,40 @@ namespace couchbase.lite
     {
         static void Main(string[] args)
         {
-            var dir = Path.Combine(Path.GetTempPath().Replace("cache", "files"), "CouchbaseLite");
+            // Get current directory to store the database.
+            var dir = Directory.GetCurrentDirectory();
+
+            // Delete the database so we can run the sample without issues.
             DatabaseFactory.DeleteDatabase("db", dir);
 
+            // Create the default options.
             var options = DatabaseOptions.Default;
             options.Directory = dir;
 
+            // Create the database
             var db = DatabaseFactory.Create("db", options);
 
-            db.InBatch(() =>
+            // Create a document the Id == "Polar Ice" an set properties. 
+            var document = db.GetDocument("Polar Ice");
+            document.Properties = new Dictionary<string, object>
             {
-                for (int i = 0; i < 10; i++)
-                {
-                    var doc = db.CreateDocument();
-                    doc.Properties = new Dictionary<string, object>
-                    {
-                        ["type"] = "user",
-                        ["name"] = $"user {i}"
-                    };
-                    doc.Save();
-                    Console.WriteLine($"saved user document {doc.GetString("name")}");
-                }
-                return true;
-            });
+                ["name"] = "Polar Ice",
+                ["brewery_id"] = "Polar"
+            };
 
-            // Have to wait for Developer Build 004
-            // var query = QueryFactory.Select()
-            //     .From(DataSourceFactory.Database(db))
-            //     .Where(
-            //         ExpressionFactory.Property("type").EqualTo("user")
-            //         .And(ExpressionFactory.Property("admin").EqualTo(false))
-            //     );
+            // Save the document
+            document.Save();
 
-            // var rows = query.Run();
-            // foreach (var row in rows)
-            // {
-            //     Console.WriteLine($"doc ID :: ${row.DocumentID}");
-            // }
+            // Query for the document abd write results to the console.
+            var query = QueryFactory.Select()
+                .From(DataSourceFactory.Database(db))
+                .Where(ExpressionFactory.Property("brewery_id").EqualTo("Polar"));
+
+            var rows = query.Run();
+            foreach (var row in rows)
+            {
+                Console.WriteLine($"Fetched doc with id :: {row.DocumentID}");
+            }
         }
     }
 }
