@@ -10,28 +10,45 @@ namespace kafka.pubsub.console
     {
         static void Main(string[] args)
         {
-            using (Producer producer = new Producer("127.0.0.1:9092"))
-            using (Topic topic = producer.Topic("testtopic"))
+            // The Kafka endpoint address
+            string kafkaEndpoint = "127.0.0.1:9092";
+
+            // The Kafka topic we'll be using
+            string kafkaTopic = "testtopic";
+
+            // Create a producer and connec to topic
+            using (Producer producer = new Producer(kafkaEndpoint))
+            using (Topic topic = producer.Topic(kafkaTopic))
             {
-                byte[] data = Encoding.UTF8.GetBytes("Hello RdKafka");
-                DeliveryReport deliveryReport = topic.Produce(data).GetAwaiter().GetResult();
-                Console.WriteLine($"Produced to Partition: {deliveryReport.Partition}, Offset: {deliveryReport.Offset}");
+                // Send 10 messages to the topic
+                for (int i = 0; i < 10; i++)
+                {
+                    byte[] data = Encoding.UTF8.GetBytes($"Event {1}");
+                    DeliveryReport deliveryReport = topic.Produce(data).GetAwaiter().GetResult();
+                    Console.WriteLine($"Event {i} sent...");
+                }
             }
 
+            // Create an Event Consumer Config
             var config = new Config() { GroupId = "myconsumer" };
             config["api.version.request"] = "true";
-            using (var consumer = new EventConsumer(config, "127.0.0.1:9092"))
+            // Create an Event Consumer
+            using (var consumer = new EventConsumer(config, kafkaEndpoint))
             {
+                // Subscribe to the OnMessage event
                 consumer.OnMessage += (obj, msg) =>
                 {
                     string text = Encoding.UTF8.GetString(msg.Payload, 0, msg.Payload.Length);
-                    Console.WriteLine($"Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {text}");
+                    Console.WriteLine($"Received: {text}");
                 };
 
-                consumer.Subscribe(new List<string> { "testtopic" });
+                // Subscribe to the Kafka topic
+                consumer.Subscribe(new List<string> { kafkaTopic });
+
+                // Start listening
                 consumer.Start();
 
-                Console.WriteLine("Started consumer, press enter to stop consuming");
+                // Wait for key to stop the app
                 Console.ReadLine();
             }
         }
