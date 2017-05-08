@@ -4,6 +4,6 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="RdKafka" Version="0.9.1" />
+    <PackageReference Include="Confluent.Kafka" Version="0.9.5" />
   </ItemGroup>
 </Project>

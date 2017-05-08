@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using RdKafka;
+using Confluent.Kafka;
+using Confluent.Kafka.Serialization;
 
 namespace kafka.pubsub.console
 {
@@ -16,40 +17,55 @@ namespace kafka.pubsub.console
             // The Kafka topic we'll be using
             string kafkaTopic = "testtopic";
 
-            // Create a producer and connec to topic
-            using (Producer producer = new Producer(kafkaEndpoint))
-            using (Topic topic = producer.Topic(kafkaTopic))
+            // Create the producer configuration
+            var producerConfig = new Dictionary<string, object> { { "bootstrap.servers", kafkaEndpoint } };
+
+            // Create the producer
+            using (var producer = new Producer<Null, string>(producerConfig, null, new StringSerializer(Encoding.UTF8)))
             {
                 // Send 10 messages to the topic
                 for (int i = 0; i < 10; i++)
                 {
-                    byte[] data = Encoding.UTF8.GetBytes($"Event {1}");
-                    DeliveryReport deliveryReport = topic.Produce(data).GetAwaiter().GetResult();
-                    Console.WriteLine($"Event {i} sent...");
+                    var message = $"Event {i}";
+                    var result = producer.ProduceAsync(kafkaTopic, null, message).GetAwaiter().GetResult();
+                    Console.WriteLine($"Event {i} sent on Partition: {result.Partition} with Offset: {result.Offset}");
                 }
             }
 
-            // Create an Event Consumer Config
-            var config = new Config() { GroupId = "myconsumer" };
-            config["api.version.request"] = "true";
-            // Create an Event Consumer
-            using (var consumer = new EventConsumer(config, kafkaEndpoint))
+            // Create the consumer configuration
+            var consumerConfig = new Dictionary<string, object>
+            {
+                { "group.id", "myconsumer" },
+                { "bootstrap.servers", kafkaEndpoint },
+            };
+
+            // Create the consumer
+            using (var consumer = new Consumer<Null, string>(consumerConfig, null, new StringDeserializer(Encoding.UTF8)))
             {
                 // Subscribe to the OnMessage event
                 consumer.OnMessage += (obj, msg) =>
                 {
-                    string text = Encoding.UTF8.GetString(msg.Payload, 0, msg.Payload.Length);
-                    Console.WriteLine($"Received: {text}");
+                    Console.WriteLine($"Received: {msg.Value}");
                 };
 
                 // Subscribe to the Kafka topic
-                consumer.Subscribe(new List<string> { kafkaTopic });
+                consumer.Subscribe(new List<string>() { kafkaTopic });
 
-                // Start listening
-                consumer.Start();
+                // Handle Cancel Keypress 
+                var cancelled = false;
+                Console.CancelKeyPress += (_, e) =>
+                {
+                    e.Cancel = true; // prevent the process from terminating.
+                    cancelled = true;
+                };
 
-                // Wait for key to stop the app
-                Console.ReadLine();
+                Console.WriteLine("Ctrl-C to exit.");
+
+                // Poll for messages
+                while (!cancelled)
+                {
+                    consumer.Poll();
+                }
             }
         }
     }
