@@ -28,6 +28,7 @@ namespace aspnet.elk.sample
                .MinimumLevel.Debug()
                .WriteTo.Elasticsearch().WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
                {
+                   MinimumLogEventLevel = LogEventLevel.Verbose,
                    AutoRegisterTemplate = true,
                })
                .CreateLogger();
