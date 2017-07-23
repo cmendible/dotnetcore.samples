@@ -1,5 +1,5 @@
 # We use the microsoft/dotnet image as a starting point.
-FROM microsoft/dotnet
+FROM microsoft/dotnet:1.1.0-sdk-projectjson
 
 # Install git
 RUN apt-get install git -y
