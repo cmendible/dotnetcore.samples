@@ -238,3 +238,4 @@ _Pvt_Extensions
 
 # NOde Modules
 node_modules/
+/azure.health/*.azureauth
