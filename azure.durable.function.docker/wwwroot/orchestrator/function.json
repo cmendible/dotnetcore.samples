@@ -1,0 +1,12 @@
+{
+    "bindings": [
+        {
+            "name": "context",
+            "type": "orchestrationTrigger",
+            "direction": "in"
+        }
+    ],
+    "disabled": false,
+    "scriptFile": "..//bin//durable.dll",
+    "entryPoint": "DurableFunctions.Orchestrator.Run"
+}

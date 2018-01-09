@@ -1,0 +1,5 @@
+FROM microsoft/azure-functions-runtime:v2.0.0-beta1
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot
+ENV AzureWebJobsStorage=[Storage_Account_Connection_String]
+ENV WEBSITE_HOSTNAME=localhost:80
+ADD wwwroot /home/site/wwwroot

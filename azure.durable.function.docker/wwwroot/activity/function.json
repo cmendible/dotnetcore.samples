@@ -1,0 +1,12 @@
+{
+    "bindings": [
+        {
+            "name": "name",
+            "type": "activityTrigger",
+            "direction": "in"
+        }
+    ],
+    "disabled": false,
+    "scriptFile": "..//bin//durable.dll",
+    "entryPoint": "DurableFunctions.Activity.Run"
+}

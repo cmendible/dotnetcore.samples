@@ -1,0 +1,22 @@
+{
+    "bindings": [
+        {
+            "authLevel": "anonymous",
+            "name": "req",
+            "type": "httpTrigger",
+            "direction": "in",
+            "route": "orchestrators/{functionName}",
+            "methods": [
+                "post"
+            ]
+        },
+        {
+            "name": "starter",
+            "type": "orchestrationClient",
+            "direction": "in"
+        }
+    ],
+    "disabled": false,
+    "scriptFile": "..//bin//durable.dll",
+    "entryPoint": "DurableFunctions.HttpStart.Run"
+}
