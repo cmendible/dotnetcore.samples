@@ -37,6 +37,7 @@ namespace kafka.pubsub.console
             {
                 { "group.id", "myconsumer" },
                 { "bootstrap.servers", kafkaEndpoint },
+                { "auto.offset.reset", "earliest" }
             };
 
             // Create the consumer
