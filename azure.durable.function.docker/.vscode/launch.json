@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to Azure Functions",
+      "type": "node",
+      "request": "attach",
+      "port": 5858,
+      "processId": null
+    },
+    {
+      "name": "Attach to Azure Functions (Java)",
+      "type": "java",
+      "request": "attach",
+      "port": 5005,
+      "processId": null
+    },
+    {
+      "name": "Attach to Azure Functions (.NET)",
+      "type": "coreclr",
+      "request": "attach",
+      "port": 0,
+      "processId": "${command:pickProcess}"
+    }
+  ]
+}
