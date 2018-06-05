@@ -23,3 +23,14 @@ docker run -it -p 5000:80 durable
 ``` bash
 curl -X POST http://localhost:5000/api/orchestrators/orchestrator -i -H "Content-Length: 0"
 ```
+
+## To Debug on localhost
+
+``` powershell
+npm install -g azure-functions-core-tools@core
+```
+
+``` powershell
+cd wwwroot
+func start --debug VSCode
+```
