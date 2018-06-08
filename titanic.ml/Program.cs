@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML;
+using Microsoft.ML.Data;
 using Microsoft.ML.Runtime.Api;
 using Microsoft.ML.Trainers;
 using Microsoft.ML.Transforms;
@@ -16,7 +17,7 @@ namespace Titanic.ML
 
             // Load training data and added to the pipeline
             string dataPath = @".\data\titanic.training.csv";
-            var data = new TextLoader<TitanicData>(dataPath, useHeader: true, separator: ",");
+            var data = new TextLoader(dataPath).CreateFrom<TitanicData>(useHeader: true, separator: ',');
             pipeline.Add(data);
 
             // Transform any text feature to numeric values
@@ -62,7 +63,7 @@ namespace Titanic.ML
             // Evaluate the model using the test data
             Console.WriteLine($"Evaluating Titanic.ML model...");
             dataPath = @".\data\titanic.csv";
-            data = new TextLoader<TitanicData>(dataPath, useHeader: true, separator: ",");
+            data = new TextLoader(dataPath).CreateFrom<TitanicData>(useHeader: true, separator: ',');
             var evaluator = new Microsoft.ML.Models.BinaryClassificationEvaluator();
             var metrics = evaluator.Evaluate(model, data);
             Console.WriteLine($"Accuracy: {metrics.Accuracy:P2}");
