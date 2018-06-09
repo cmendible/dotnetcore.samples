@@ -12,10 +12,10 @@ namespace Titanic.ML
     {
         static async Task Main(string[] args)
         {
-            // Create a pipeline and load your data
+            // Create a learning pipeline
             var pipeline = new LearningPipeline();
 
-            // Load training data and added to the pipeline
+            // Load training data and add it to the pipeline
             string dataPath = @".\data\titanic.training.csv";
             var data = new TextLoader(dataPath).CreateFrom<TitanicData>(useHeader: true, separator: ',');
             pipeline.Add(data);
@@ -28,15 +28,25 @@ namespace Titanic.ML
                 "Cabin",
                 "Embarked"));
 
-            // Puts all features into a vector
-            pipeline.Add(new ColumnConcatenator("Features", "Pclass", "Sex", "Age", "SibSp", "Parch", "Ticket", "Fare", "Cabin", "Embarked"));
+            // Put all features into a vector
+            pipeline.Add(new ColumnConcatenator(
+                "Features",
+                "Pclass",
+                "Sex",
+                "Age",
+                "SibSp",
+                "Parch",
+                "Ticket",
+                "Fare",
+                "Cabin",
+                "Embarked"));
 
             // Add a learning algorithm to the pipeline. 
             // This is a classification scenario (Did this passenger survive?)
             pipeline.Add(new FastTreeBinaryClassifier() { NumLeaves = 5, NumTrees = 5, MinDocumentsInLeafs = 2 });
 
-            Console.WriteLine($"Training Titanic.ML model...");
             // Train your model based on the data set
+            Console.WriteLine($"Training Titanic.ML model...");
             var model = pipeline.Train<TitanicData, TitanicPrediction>();
 
             // Save the model to a file
@@ -66,6 +76,7 @@ namespace Titanic.ML
             data = new TextLoader(dataPath).CreateFrom<TitanicData>(useHeader: true, separator: ',');
             var evaluator = new Microsoft.ML.Models.BinaryClassificationEvaluator();
             var metrics = evaluator.Evaluate(model, data);
+
             Console.WriteLine($"Accuracy: {metrics.Accuracy:P2}");
             Console.WriteLine($"Auc: {metrics.Auc:P2}");
             Console.WriteLine($"F1Score: {metrics.F1Score:P2}");
