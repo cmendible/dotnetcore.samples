@@ -236,9 +236,12 @@ _Pvt_Extensions
 .fake/
 /projectoxford/detectedfaces.jpg
 
-# NOde Modules
+# Node Modules
 node_modules/
 /azure.health/*.azureauth
 
 # .NET ML Model
 **/*.model
+
+# BenchmarkDotNet
+BenchmarkDotNet.Artifacts
