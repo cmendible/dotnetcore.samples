@@ -15,7 +15,7 @@ namespace benchmark
         }
     }
 
-    // We are using .Net Core so add we are adding the CoreJobAttribute here.
+    // We are using .Net Core we are adding the CoreJobAttribute here.
     [CoreJob(baseline: true)]
     [RPlotExporter, RankColumn]
     public class ForEachVsFor
@@ -23,7 +23,7 @@ namespace benchmark
         private static Random random = new Random();
         private List<int> list;
 
-        public static List<int> RandomIntArray(int length)
+        public static List<int> RandomIntList(int length)
         {
             int Min = 1;
             int Max = 10;
@@ -33,17 +33,17 @@ namespace benchmark
                 .ToList();
         }
 
-        // We wil run the the test for 3 diff array lengths
+        // We wil run the the test for 3 diff list sizes
         [Params(10, 100, 1000)]
         public int N;
 
         [GlobalSetup]
         public void Setup()
         {
-            list = RandomIntArray(N);
+            list = RandomIntList(N);
         }
 
-        // Foreach is 2 times slower than for
+        // Foreach is ~2 times slower than for
         [Benchmark]
         public void Foreach()
         {
@@ -54,7 +54,7 @@ namespace benchmark
             }
         }
 
-        // For is 2 times faster than foreach
+        // For is ~2 times faster than foreach
         [Benchmark]
         public void For()
         {
