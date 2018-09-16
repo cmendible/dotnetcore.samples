@@ -31,7 +31,7 @@ namespace benchmark
         }
 
         // We wil run the the test for 2 diff string lengths: 10 & 100
-        [Params(10, 100)]
+        [Params(10, 100, 10000)]
         public int N;
 
 
@@ -50,5 +50,9 @@ namespace benchmark
         // This is the fast way of comparing strings, so let's benchmark it.
         [Benchmark]
         public bool Fast() => string.Compare(s1, s2, true) == 0;
+
+        // This is the fastest!!! way of comparing strings, so let's benchmark it.
+        [Benchmark]
+        public bool Faster() => string.Equals(s1, s2, StringComparison.OrdinalIgnoreCase);
     }
 }
