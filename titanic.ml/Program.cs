@@ -1,10 +1,14 @@
-﻿using Microsoft.ML;
-using Microsoft.ML.Data;
-using Microsoft.ML.Runtime.Api;
+﻿using System;
+using System.IO;
+using Microsoft.ML.Runtime.Learners;
+using Microsoft.ML.Runtime.Data;
+using Microsoft.ML.Core.Data;
+using Microsoft.ML;
 using Microsoft.ML.Trainers;
-using Microsoft.ML.Transforms;
-using System;
+using Microsoft.ML.Transforms.Text;
+using System.Data;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Titanic.ML
 {
@@ -12,49 +16,61 @@ namespace Titanic.ML
     {
         static async Task Main(string[] args)
         {
-            // Create a learning pipeline
-            var pipeline = new LearningPipeline();
+            //Create MLContext to be shared across the model creation workflow objects 
+            //Set a random seed for repeatable/deterministic results across multiple trainings.
+            var mlContext = new MLContext();
+
+            // STEP 1: Common data loading configuration
+            // PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+            var textLoader = mlContext.Data.TextReader(new TextLoader.Arguments()
+            {
+                Separator = ",",
+                HasHeader = true,
+                Column = new[]
+                {
+                    new TextLoader.Column("PassengerId", DataKind.Num, 0),
+                    new TextLoader.Column("Label", DataKind.Bool, 1),
+                    new TextLoader.Column("Pclass", DataKind.Num, 2),
+                    new TextLoader.Column("Name", DataKind.Text, 3),
+                    new TextLoader.Column("Sex", DataKind.Text, 4),
+                    new TextLoader.Column("Age", DataKind.Num, 5),
+                    new TextLoader.Column("SibSp", DataKind.Num, 6),
+                    new TextLoader.Column("Parch", DataKind.Num, 7),
+                    new TextLoader.Column("Ticket", DataKind.Text, 8),
+                    new TextLoader.Column("Fare", DataKind.Text, 9),
+                    new TextLoader.Column("Cabin", DataKind.Text, 10),
+                    new TextLoader.Column("Embarked", DataKind.Text, 11)
+                }
+            });
 
             // Load training data and add it to the pipeline
-            string dataPath = @".\data\titanic.training.csv";
-            var data = new TextLoader(dataPath).CreateFrom<TitanicData>(useHeader: true, separator: ',');
-            pipeline.Add(data);
+            string trainingDataPath = @".\data\titanic.training.csv";
+            string dataPath = @".\data\titanic.csv";
+            var trainingData = textLoader.Read(trainingDataPath);
+            var testData = textLoader.Read(dataPath);
 
-            // Transform any text feature to numeric values
-            pipeline.Add(new CategoricalOneHotVectorizer(
-                "Sex",
-                "Ticket",
-                "Fare",
-                "Cabin",
-                "Embarked"));
+            var features = trainingData.Schema.GetColumns()
+                .Where(c => c.column.Name != "Label")
+                .Select(c => c.column.Name)
+                .ToArray();
 
-            // Put all features into a vector
-            pipeline.Add(new ColumnConcatenator(
-                "Features",
-                "Pclass",
-                "Sex",
-                "Age",
-                "SibSp",
-                "Parch",
-                "Ticket",
-                "Fare",
-                "Cabin",
-                "Embarked"));
+            // Build several alternative featurization pipelines.
+            var pipeline =
+                mlContext.Transforms.Categorical.OneHotEncoding("Sex")
+                .Append(mlContext.Transforms.Categorical.OneHotEncoding("Name"))
+                .Append(mlContext.Transforms.Categorical.OneHotEncoding("Ticket"))
+                .Append(mlContext.Transforms.Categorical.OneHotEncoding("Fare"))
+                .Append(mlContext.Transforms.Categorical.OneHotEncoding("Cabin"))
+                .Append(mlContext.Transforms.Categorical.OneHotEncoding("Embarked"))
+                .Append(mlContext.Transforms.Concatenate("Features", features))
+                .Append(mlContext.BinaryClassification.Trainers.FastTree(labelColumn: "Label", featureColumn: "Features"));
 
-            // Add a learning algorithm to the pipeline. 
-            // This is a classification scenario (Did this passenger survive?)
-            pipeline.Add(new FastTreeBinaryClassifier() { NumLeaves = 5, NumTrees = 5, MinDocumentsInLeafs = 2 });
+            // Train the model.
+            var model = pipeline.Fit(trainingData);
 
-            // Train your model based on the data set
-            Console.WriteLine($"Training Titanic.ML model...");
-            var model = pipeline.Train<TitanicData, TitanicPrediction>();
-
-            // Save the model to a file
-            var modelPath = @".\data\titanic.model";
-            await model.WriteAsync(modelPath);
-
-            // Use your model to make a prediction
-            var prediction = model.Predict(new TitanicData()
+            // Create a PredictionFunction from our model 
+            var predictor = model.MakePredictionFunction<TitanicData, TitanicPrediction>(mlContext);
+            var prediction = predictor.Predict(new TitanicData()
             {
                 Pclass = 3f,
                 Name = "Braund, Mr. Owen Harris",
@@ -70,14 +86,9 @@ namespace Titanic.ML
 
             Console.WriteLine($"Did this passenger survive? {(prediction.Survived ? "Yes" : "No")}");
 
-            // Evaluate the model using the test data
-            Console.WriteLine($"Evaluating Titanic.ML model...");
-            dataPath = @".\data\titanic.csv";
-            data = new TextLoader(dataPath).CreateFrom<TitanicData>(useHeader: true, separator: ',');
-            var evaluator = new Microsoft.ML.Models.BinaryClassificationEvaluator();
-            var metrics = evaluator.Evaluate(model, data);
-
-            Console.WriteLine($"Accuracy: {metrics.Accuracy:P2}");
+            var context = new BinaryClassificationContext(mlContext);
+            var metrics = context.Evaluate(model.Transform(testData), "Label");
+            Console.WriteLine("Acuracy: " + metrics.Accuracy);
             Console.WriteLine($"Auc: {metrics.Auc:P2}");
             Console.WriteLine($"F1Score: {metrics.F1Score:P2}");
         }
