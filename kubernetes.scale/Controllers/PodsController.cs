@@ -19,7 +19,7 @@ namespace kubernetes.scale
         public PodsController(IConfiguration config)
         {
             // Reading configuration to know if running inside a cluster or in local mode.
-
+            var useKubeConfig = bool.Parse(config["UseKubeConfig"]);
             if (!useKubeConfig)
             {
                 // Running inside a k8s cluser

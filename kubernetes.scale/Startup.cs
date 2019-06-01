@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace kuberenetes.scale
+namespace kubernetes.scale
 {
     public class Startup
     {

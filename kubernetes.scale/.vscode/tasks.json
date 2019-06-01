@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/kuberenetes.scale.csproj"
+                "${workspaceFolder}/kubernetes.scale.csproj"
             ],
             "problemMatcher": "$tsc"
         },
@@ -17,7 +17,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/kuberenetes.scale.csproj"
+                "${workspaceFolder}/kubernetes.scale.csproj"
             ],
             "problemMatcher": "$tsc"
         },
@@ -28,7 +28,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/kuberenetes.scale.csproj"
+                "${workspaceFolder}/kubernetes.scale.csproj"
             ],
             "problemMatcher": "$tsc"
         }
