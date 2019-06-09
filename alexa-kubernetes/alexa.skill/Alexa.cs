@@ -164,8 +164,7 @@ namespace AlexaSkill
                 return false;
             }
 
-            var date = skillRequest.Request.Timestamp.ToLocalTime();
-            bool isTimestampValid = RequestVerification.RequestTimestampWithinTolerance(date);
+            bool isTimestampValid = RequestVerification.RequestTimestampWithinTolerance(skillRequest);
             bool valid = await RequestVerification.Verify(signature, certUrl, body);
 
             if (!valid || !isTimestampValid)
