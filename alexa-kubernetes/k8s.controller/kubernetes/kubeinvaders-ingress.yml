@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubeinvaders 
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - kubeinvaders.<DNS ZONE NAME>
+  rules:
+  - host: kubeinvaders.<DNS ZONE NAME> 
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kubeinvaders 
+          servicePort: 8080
