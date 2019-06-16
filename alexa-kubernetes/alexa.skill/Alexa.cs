@@ -9,10 +9,6 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET;
 using Alexa.NET.Response;
-using System.Collections.Generic;
-using System.Xml;
-using Microsoft.SyndicationFeed.Rss;
-using System.Linq;
 using System;
 using System.Net.Http;
 using System.Text;
@@ -53,7 +49,7 @@ namespace AlexaSkill
 
             if (requestType == typeof(LaunchRequest))
             {
-                response = ResponseBuilder.Ask("Welcome to dNext!!! Thanks for the invite Carlos! Glad to see my everis brothers and sisters today!", new Reprompt());
+                response = ResponseBuilder.Ask("Hi Carlos! Thanks for the invite! Glad to help you with your session today!", new Reprompt());
             }
             else if (requestType == typeof(IntentRequest))
             {
@@ -81,7 +77,7 @@ namespace AlexaSkill
                     {
                         var pods = await k8sresponse.Content.ReadAsAsync<string[]>();
                         var message = string.Join(",", pods);
-                        response = ResponseBuilder.Tell($"Found the following pods in the default namespace: {pods}");
+                        response = ResponseBuilder.Tell($"Found the following pods in the default namespace: {message}");
                     }
                 }
 
