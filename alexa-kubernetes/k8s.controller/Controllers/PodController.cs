@@ -35,7 +35,7 @@ namespace KubernetesController
             // Use the config object to create a client.
             using (var client = new Kubernetes(k8sConfig))
             {
-                var podList = client.ListNamespacedPod("default");
+                var podList = client.ListNamespacedPod("invaders");
                 return podList.Items.Select(p => p.Metadata.Name).ToArray();
             }
         }
@@ -64,7 +64,7 @@ namespace KubernetesController
                 var patch = new V1Patch(jsonPatch);
 
                 // Patch the Deployment
-                client.PatchNamespacedDeploymentScale(patch, "invader", "invaders");
+                client.PatchNamespacedDeploymentScale(patch, "invaders", "invaders");
 
                 return NoContent();
             }
