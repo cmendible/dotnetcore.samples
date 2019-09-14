@@ -2,12 +2,19 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: kubeinvaders-rolebinding
-  namespace: invaders 
+  namespace: invaders
 subjects:
-- kind: ServiceAccount
-  name: kubeinvaders 
-  namespace: invaders 
+  - kind: ServiceAccount
+    name: kubeinvaders
+    namespace: invaders
 roleRef:
   kind: Role
-  name: kubeinvaders-role 
+  name: kubeinvaders-role
   apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubeinvaders
+  namespace: invaders

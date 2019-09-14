@@ -1,0 +1,5 @@
+{
+  "kind": "Namespace",
+  "apiVersion": "v1",
+  "metadata": { "name": "invaders", "labels": { "name": "invaders" } },
+}

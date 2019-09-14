@@ -1,11 +1,5 @@
 {
   "kind": "Namespace",
   "apiVersion": "v1",
-  "metadata": {
-    "name": "kubeinvaders",
-    "labels": {
-      "name": "kubeinvaders"
-    }
-  }
+  "metadata": { "name": "kubeinvaders", "labels": { "name": "kubeinvaders" } },
 }
-

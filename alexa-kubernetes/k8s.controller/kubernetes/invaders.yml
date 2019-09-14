@@ -8,6 +8,7 @@ metadata:
   labels:
     run: invaders
   name: invaders
+  namespace: invaders
 spec:
   replicas: 10
   selector:
@@ -19,10 +20,10 @@ spec:
         run: invaders
     spec:
       containers:
-      - image: busybox
-        command:
-          - sleep
-          - "3600"
-        imagePullPolicy: IfNotPresent
-        name: busybox
+        - image: busybox
+          command:
+            - sleep
+            - "3600"
+          imagePullPolicy: IfNotPresent
+          name: busybox
       restartPolicy: Always
