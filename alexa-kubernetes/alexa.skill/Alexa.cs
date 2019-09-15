@@ -19,6 +19,14 @@ namespace AlexaSkill
     {
         private static HttpClient restClient => RestClient();
 
+        private static string k8sServiceUri => GetK8sServiceUri();
+
+        private static string GetK8sServiceUri()
+        {
+            var uri = Environment.GetEnvironmentVariable("k8sServiceUri", EnvironmentVariableTarget.Process);
+            return !string.IsNullOrEmpty(uri) ? uri : "https://localhost:5001";
+        }
+
         private static HttpClient RestClient()
         {
             var httpClientHandler = new HttpClientHandler();
@@ -57,7 +65,7 @@ namespace AlexaSkill
 
                 if (intentRequest.Intent.Name == "namespaces")
                 {
-                    var endpoint = "https://localhost:5001/api/pods/namespaces";
+                    var endpoint = $"{k8sServiceUri}/api/pods/namespaces";
                     var k8sresponse = await restClient.GetAsync(endpoint);
 
                     if (k8sresponse.IsSuccessStatusCode)
@@ -70,7 +78,7 @@ namespace AlexaSkill
 
                 if (intentRequest.Intent.Name == "pods")
                 {
-                    var endpoint = "https://localhost:5001/api/pods";
+                    var endpoint = $"{k8sServiceUri}/api/pods";
                     var k8sresponse = await restClient.GetAsync(endpoint);
 
                     if (k8sresponse.IsSuccessStatusCode)
@@ -83,7 +91,7 @@ namespace AlexaSkill
 
                 if (intentRequest.Intent.Name == "scale")
                 {
-                    var endpoint = "https://localhost:5001/api/pods/scale";
+                    var endpoint = $"{k8sServiceUri}/api/pods/scale";
 
                     var replicas = intentRequest.Intent.Slots["replicas"].Value;
 
