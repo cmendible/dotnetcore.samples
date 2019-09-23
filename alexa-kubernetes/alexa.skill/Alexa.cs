@@ -85,7 +85,7 @@ namespace AlexaSkill
                     {
                         var pods = await k8sresponse.Content.ReadAsAsync<string[]>();
                         var message = string.Join(",", pods);
-                        response = ResponseBuilder.Tell($"Found the following pods in the default namespace: {message}");
+                        response = ResponseBuilder.Tell($"Found the following pods in the invaders namespace: {message}");
                     }
                 }
 
