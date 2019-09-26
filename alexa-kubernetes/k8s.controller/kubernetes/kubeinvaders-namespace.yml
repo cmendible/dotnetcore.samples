@@ -1,5 +1,6 @@
-{
-  "kind": "Namespace",
-  "apiVersion": "v1",
-  "metadata": { "name": "kubeinvaders", "labels": { "name": "kubeinvaders" } },
-}
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: "kubeinvaders"
+  labels:
+    name: "kubeinvaders"
