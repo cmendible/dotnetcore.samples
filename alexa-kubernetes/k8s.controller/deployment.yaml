@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-orujo-http
+  namespace: default
+spec:
+  selector:
+    app: k8s-orujo-http
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-orujo-http
+  namespace: default
+  labels:
+    app: k8s-orujo-http
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-orujo-http
+  template:
+    metadata:
+      labels:
+        app: k8s-orujo-http
+    spec:
+      serviceAccountName: k8s-orujo-http
+      containers:
+        - name: k8s-orujo-http
+          image: cmendibl3/k8s.orujo
+          ports:
+            - containerPort: 80
+          env:
+            - name: eventGridEndPoint
+              value: "<event grid endpoint>"
+            - name: eventGridSAS
+              value: "event grid SAS"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: k8s-orujo-http
+  namespace: default
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: k8s-orujo-http
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: k8s-orujo-http
+    namespace: default

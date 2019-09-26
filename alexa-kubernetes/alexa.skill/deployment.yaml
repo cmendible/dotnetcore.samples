@@ -1,0 +1,80 @@
+data:
+  FUNCTIONS_WORKER_RUNTIME: ZG90bmV0
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alexa-orujo
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alexa-orujo-http
+  namespace: default
+  annotations:
+    osiris.deislabs.io/enabled: true
+    osiris.deislabs.io/deployment: alexa-orujo-http
+spec:
+  selector:
+    app: alexa-orujo-http
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alexa-orujo-http
+  namespace: default
+  labels:
+    app: alexa-orujo-http
+  annotations:
+    osiris.deislabs.io/enabled: true
+    osiris.deislabs.io/minReplicas: 1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alexa-orujo-http
+  template:
+    metadata:
+      labels:
+        app: alexa-orujo-http
+    spec:
+      containers:
+        - name: alexa-orujo-http
+          image: cmendibl3/alexa.orujo
+          ports:
+            - containerPort: 80
+          env:
+            - name: AzureFunctionsJobHost__functions__0
+              value: Alexa
+            - name: k8sServiceUri
+              value: http://k8s-orujo-http
+          envFrom:
+            - secretRef:
+                name: alexa-orujo
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: alexa-orujo-http
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+        - alexa-orujo-http.<DNS ZONE NAME>
+      secretName: tls-secret
+  rules:
+    - host: alexa-orujo-http.<DNS ZONE NAME>
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: alexa-orujo-http
+              servicePort: 80
