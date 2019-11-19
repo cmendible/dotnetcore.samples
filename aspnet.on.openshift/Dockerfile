@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:1.1.4-runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0
 
 # Set ASPNETCORE_URLS
 ENV ASPNETCORE_URLS=https://*:8080
@@ -7,7 +7,7 @@ ENV ASPNETCORE_URLS=https://*:8080
 USER 0
 
 # Copy the binaries
-COPY /bin/release/netcoreapp1.1/publish app
+COPY /bin/release/netcoreapp3.0/publish app
 
 # Change to app directory
 WORKDIR app
