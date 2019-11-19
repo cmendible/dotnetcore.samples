@@ -14,35 +14,38 @@ namespace couchbase.lite
             var dir = Directory.GetCurrentDirectory();
 
             // Delete the database so we can run the sample without issues.
-            DatabaseFactory.DeleteDatabase("db", dir);
+            Database.Delete("db", dir);
 
             // Create the default options.
-            var options = DatabaseOptions.Default;
-            options.Directory = dir;
-
-            // Create the database
-            var db = DatabaseFactory.Create("db", options);
-
-            // Create a document the Id == "Polar Ice" an set properties. 
-            var document = db.GetDocument("Polar Ice");
-            document.Properties = new Dictionary<string, object>
+            var options = new DatabaseConfiguration
             {
-                ["name"] = "Polar Ice",
-                ["brewery_id"] = "Polar"
+                Directory = dir
             };
 
-            // Save the document
-            document.Save();
-
-            // Query for the document abd write results to the console.
-            var query = QueryFactory.Select()
-                .From(DataSourceFactory.Database(db))
-                .Where(ExpressionFactory.Property("brewery_id").EqualTo("Polar"));
-
-            var rows = query.Run();
-            foreach (var row in rows)
+            // Create the database and a document with Id == "Polar Ice"
+            using (var db = new Database("db", options))
+            using(var document = new MutableDocument("Polar Ice"))
             {
-                Console.WriteLine($"Fetched doc with id :: {row.DocumentID}");
+
+                // Set properties on document
+                document.SetString("name", "Polar Ice")
+                    .SetString("brewery_id", "Polar");
+
+                // Save the document
+                db.Save(document);
+
+                // Query for the document abd write results to the console.
+                using (var query = QueryBuilder.Select(SelectResult.Expression(Meta.ID), SelectResult.All())
+                    .From(DataSource.Database(db))
+                    .Where(Expression.Property("brewery_id").EqualTo(Expression.String("Polar"))))
+                {
+
+                    var rows = query.Execute();
+                    foreach (var row in rows)
+                    {
+                        Console.WriteLine($"Fetched doc with id :: {row.GetString(0)}");
+                    }
+                }
             }
         }
     }
