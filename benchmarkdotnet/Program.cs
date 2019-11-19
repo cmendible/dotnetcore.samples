@@ -15,7 +15,7 @@ namespace benchmark
     }
 
     // We are using .Net Core so add we are adding the CoreJobAttribute here.
-    [CoreJob(baseline: true)]
+    [SimpleJob(baseline: true)]
     [RPlotExporter, RankColumn]
     public class StringCompareVsEquals
     {
