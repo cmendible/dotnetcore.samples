@@ -15,9 +15,3 @@ jobs:
         dotnet-version: 3.0.100
     - name: Build with dotnet
       run: find . -type f \( -iname "*.csproj" \) | xargs -n1 dotnet build
-
-        
-        
-        
-        
-        :  
