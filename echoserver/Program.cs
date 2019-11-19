@@ -1,16 +1,17 @@
-﻿namespace EchoServer
-{
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
 
+namespace EchoServer
+{
     class Program
     {
         static int Main(string[] args)
         {
-            WebHost.CreateDefaultBuilder()
-                .UseKestrel()
-                .Configure(app =>
+            Host.CreateDefaultBuilder()
+            .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.Configure(app =>
                     {
                         app.Run(httpContext =>
                         {
@@ -25,8 +26,10 @@
 
                             // Echo the body
                             return request.Body.CopyToAsync(response.Body);
+
                         });
-                    })
+                    });
+                })
                 .Build()
                 .Run();
 
