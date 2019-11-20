@@ -1,0 +1,1 @@
+Please check: https://github.com/cmendible/dotnetcore.samples/tree/master/aspnet.serilog.sample for the latest sample
