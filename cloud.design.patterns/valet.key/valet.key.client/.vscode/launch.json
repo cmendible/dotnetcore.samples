@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}\\bin\\Debug\\netcoreapp1.0\\valet.key.client.dll",
+            "program": "${workspaceRoot}\\bin\\Debug\\netcoreapp3.0\\valet.key.client.dll",
             "args": [],
             "cwd": "${workspaceRoot}",
             "externalConsole": false,

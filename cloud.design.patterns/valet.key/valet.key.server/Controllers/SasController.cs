@@ -18,7 +18,7 @@
 
         private readonly string blobContainer = "valetkeysample";
 
-        public SasController(IConfigurationRoot configuration)
+        public SasController(IConfiguration configuration)
         {
             accountName = configuration["StorageAccountName"];
             storageKey = configuration["StorageAccountKey"];
@@ -56,7 +56,7 @@
 
             return blobSas;
         }
-        
+
         /// <summary>
         /// Creates an empty blob
         /// </summary>

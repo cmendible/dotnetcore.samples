@@ -1,66 +1,38 @@
 namespace Health.Enpoint.Monitor
 {
-    using AspNetCore.Health;
+    using System;
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Hosting;
 
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsDevelopment())
-            {
-                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets();
-            }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Adding options so we can inject configurations.
-            services.AddOptions();
+            services.AddRouting();
 
-            services.AddSingleton<IConfigurationRoot>(Configuration);
-
-            services.AddMvc();
+            services.AddHealthChecks()
+                .AddUrlGroup(new Uri("https://carlos.mendible.com"), "CodeItYourSelf")
+                .AddUrlGroup(new Uri("http://localhost:51234/"), "UnhealthyService");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
-                app.UseBrowserLink();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
-
-            var options = new HealthCheckOptions()
-                .AddWebService("CodeItYourSelf", "https://carlos.mendible.com")
-                .AddWebService("UnhealthyService", "http://localhost:51234/");
-
-            app.UseHealthCheck(options);
+            app.UseRouting()
+                .UseEndpoints(config =>
+                {
+                    config.MapHealthChecks("/health");
+                });
         }
     }
 }
