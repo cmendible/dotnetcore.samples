@@ -8,7 +8,7 @@
     "profile": "default",
     "region": "eu-west-1",
     "configuration": "Release",
-    "framework": "netcoreapp1.0",
-    "function-runtime": "dotnetcore1.0",
+    "framework": "netcoreapp3.0",
+    "function-runtime": "dotnetcore3.0",
     "template": "serverless.template"
 }
