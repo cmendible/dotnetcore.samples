@@ -36,7 +36,7 @@
       "type": "shell",
       "dependsOn": "build",
       "options": {
-        "cwd": "${workspaceFolder}/bin/Debug/netcoreapp2.2"
+        "cwd": "${workspaceFolder}/bin/Debug/netcoreapp3.0"
       },
       "command": "func host start",
       "isBackground": true,
