@@ -14,8 +14,8 @@ RUN cd /src/dotnet-function-app && \
     mkdir -p /home/site/wwwroot && \
     dotnet publish *.csproj --output /home/site/wwwroot
 
-# Waiting for a preview of v3
-FROM mcr.microsoft.com/azure-functions/dotnet:2.0
+# Using v3 preview
+FROM mcr.microsoft.com/azure-functions/dotnet:3.0-preview
 ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true
 
