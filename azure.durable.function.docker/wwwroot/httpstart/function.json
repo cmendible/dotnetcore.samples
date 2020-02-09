@@ -12,11 +12,11 @@
         },
         {
             "name": "starter",
-            "type": "orchestrationClient",
+            "type": "durableClient",
             "direction": "in"
         }
     ],
     "disabled": false,
-    "scriptFile": "..//bin//durable.dll",
+    "scriptFile": "..//..//bin//Debug//netstandard2.0//durable.dll",
     "entryPoint": "DurableFunctions.HttpStart.Run"
 }

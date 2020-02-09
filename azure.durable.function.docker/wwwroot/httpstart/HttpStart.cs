@@ -1,9 +1,10 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.Extensions.Logging;
 
 namespace DurableFunctions
 {
@@ -11,19 +12,19 @@ namespace DurableFunctions
     {
         public static async Task<HttpResponseMessage> Run(
             HttpRequestMessage req,
-            DurableOrchestrationClient starter,
+            [DurableClient] IDurableOrchestrationClient starter,
             string functionName,
-            TraceWriter log)
+            ILogger log)
         {
             // Function input comes from the request content.
-            dynamic eventData = await req.Content.ReadAsAsync<object>();
-            string instanceId = await starter.StartNewAsync(functionName, eventData);
-            
-            log.Info($"Started orchestration with ID = '{instanceId}'.");
-            
+            object eventData = await req.Content.ReadAsAsync<object>();
+            var instanceId = await starter.StartNewAsync(functionName, eventData);
+
+            log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
+
             var res = starter.CreateCheckStatusResponse(req, instanceId);
             res.Headers.RetryAfter = new RetryConditionHeaderValue(TimeSpan.FromSeconds(10));
             return res;
         }
-    }    
+    }
 }

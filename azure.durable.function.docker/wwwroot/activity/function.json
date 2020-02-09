@@ -7,6 +7,6 @@
         }
     ],
     "disabled": false,
-    "scriptFile": "..//bin//durable.dll",
+    "scriptFile": "..//..//bin///Debug//netstandard2.0//durable.dll",
     "entryPoint": "DurableFunctions.Activity.Run"
 }
