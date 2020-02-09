@@ -245,3 +245,6 @@ node_modules/
 
 # BenchmarkDotNet
 BenchmarkDotNet.Artifacts
+
+# pem files
+*.pem
