@@ -1,0 +1,19 @@
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+C = ES
+ST = MA
+L = MAD
+O = mendible.com
+CN = alexa-orujo-http
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @subject_alternate_names
+
+[subject_alternate_names]
+DNS.1 = alexa-orujo-http.<DNS ZONE NAME>
