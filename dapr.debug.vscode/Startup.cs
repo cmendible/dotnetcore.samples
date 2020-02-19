@@ -12,6 +12,8 @@ namespace DaprIntro
 {
     public class Startup
     {
+        private const string StateStore = "statestore";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -57,7 +59,7 @@ namespace DaprIntro
                 var client = context.RequestServices.GetRequiredService<StateClient>();
 
                 var id = (string)context.Request.RouteValues["id"];
-                var account = await client.GetStateAsync<Account>(id);
+                var account = await client.GetStateAsync<Account>(StateStore, id);
                 if (account == null)
                 {
                     context.Response.StatusCode = 404;
@@ -73,7 +75,7 @@ namespace DaprIntro
                 var client = context.RequestServices.GetRequiredService<StateClient>();
 
                 var transaction = await JsonSerializer.DeserializeAsync<Transaction>(context.Request.Body, serializerOptions);
-                var account = await client.GetStateAsync<Account>(transaction.Id);
+                var account = await client.GetStateAsync<Account>(StateStore, transaction.Id);
                 if (account == null)
                 {
                     account = new Account() { Id = transaction.Id, };
@@ -86,7 +88,7 @@ namespace DaprIntro
                 }
 
                 account.Balance += transaction.Amount;
-                await client.SaveStateAsync(transaction.Id, account);
+                await client.SaveStateAsync(StateStore, transaction.Id, account);
 
                 context.Response.ContentType = "application/json";
                 await JsonSerializer.SerializeAsync(context.Response.Body, account, serializerOptions);
@@ -97,7 +99,7 @@ namespace DaprIntro
                 var client = context.RequestServices.GetRequiredService<StateClient>();
 
                 var transaction = await JsonSerializer.DeserializeAsync<Transaction>(context.Request.Body, serializerOptions);
-                var account = await client.GetStateAsync<Account>(transaction.Id);
+                var account = await client.GetStateAsync<Account>(StateStore, transaction.Id);
                 if (account == null)
                 {
                     context.Response.StatusCode = 404;
@@ -111,7 +113,7 @@ namespace DaprIntro
                 }
 
                 account.Balance -= transaction.Amount;
-                await client.SaveStateAsync(transaction.Id, account);
+                await client.SaveStateAsync(StateStore, transaction.Id, account);
 
                 context.Response.ContentType = "application/json";
                 await JsonSerializer.SerializeAsync(context.Response.Body, account, serializerOptions);
