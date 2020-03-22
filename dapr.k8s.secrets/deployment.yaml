@@ -1,0 +1,51 @@
+---
+# ASP.NET Core Application
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: dapr-k8s-secrets
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dapr-k8s-secrets
+        aadpodidbinding: requires-vault
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/id: "dapr-k8s-secrets"
+        dapr.io/port: "80"
+    spec:
+      containers:
+        - name: dapr-k8s-secrets
+          image: cmendibl3/dapr-k8s-secrets:1.0.0
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+
+---
+# Create a Kubernetes Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: super-secret
+  namespace: default
+type: Opaque
+data:
+  super-secret: eW91ciBzdXBlciBzZWNyZXQK
+
+---
+# If RBAC is enabled in K8s, give the default SA access to secrets in the default namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dapr-secret-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secret-reader
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
