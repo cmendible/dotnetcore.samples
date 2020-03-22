@@ -4,7 +4,7 @@ dapr run --app-id routing --app-port 5000 dotnet run
 
 ## REST:
 
-curl -X POST http://127.0.0.1:5000/deposit -H "Content-Type: application/json" -d "'{ \"id\": \"17\", \"amount\": 12 }'
+curl -X POST http://127.0.0.1:5000/deposit -H "Content-Type: application/json" -d '{ \"id\": \"17\", \"amount\": 12 }'
 
 curl -X POST http://127.0.0.1:5000/withdraw -H "Content-Type: application/json" -d '{ \"id\": \"17\", \"amount\": 10 }'
 
